@@ -8,7 +8,11 @@
     var radio;
 
     socket.on('joined', function (data) {
-      document.getElementById("content").innerHTML+="Successfully joined " + data + " notification channel.<br/>";
+      if (data === "flows") {
+        document.getElementById("content").innerHTML+="Successfully joined flows notification channel.<br/>";
+      } else {
+        document.getElementById("content").innerHTML+="Successfully joined notification channel for radio: " + JSON.stringify(data) + ".<br/>";
+      }  
     });
 
     socket.emit('join', 'flows');
