@@ -23,15 +23,6 @@ module.exports.streams = streams = (id, fn) ->
   query.on "error", (err) ->
     fn null, err
 
-module.exports.metadata = metadata = (id, fn) ->
-  query = client.query "SELECT * FROM metadatas WHERE radio_id = $1 LIMIT 1", [parseInt id]
-
-  query.on "row", (row) ->
-    fn row, null
-
-  query.on "error", (err) ->
-    fn null, err
-
 cleanRadio = (radio) ->
   # Remove user id and last_seen
   delete radio.user_id
@@ -57,19 +48,13 @@ radioFromSql = (sql, args, fn) ->
     radio = ans.pop()
     return fn radio, null unless radio?
 
-    metadata radio.id, (meta, err) ->
+    streams radio.id, (streams, err) ->
       return fn null, err if err?
 
-      radio.title  = meta.title
-      radio.artist = meta.artist
-
-      streams radio.id, (streams, err) ->
-        return fn null, err if err?
-
-        radio.streams = streams
+      radio.streams = streams
         
-        cleanRadio radio
-        fn radio, null
+      cleanRadio radio
+      fn radio, null
 
   query.on "error", (err) ->
     fn null, err
@@ -108,28 +93,18 @@ module.exports.radios = (fn) ->
     enhance = (radio) ->
       return if error
 
-      metadata radio.id, (meta, err) ->
+      streams radio.id, (streams, err) ->
         error = err?
         return fn null, err if err?
 
-        # Remove user id
-        delete radio.user_id
-
-        radio.title  = meta.title
-        radio.artist = meta.artist
-
-        streams radio.id, (streams, err) ->
-          error = err?
-          return fn null, err if err?
-
-          radio.streams = streams
+        radio.streams = streams
           
-          cleanRadio radio
-          radios.push radio
+        cleanRadio radio
+        radios.push radio
 
-          if radios.length == ans.length
-            sortRadios radios
-            fn radios, null
+        if radios.length == ans.length
+          sortRadios radios
+          fn radios, null
 
     enhance radio for radio in ans
 
