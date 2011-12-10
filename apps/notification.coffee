@@ -5,12 +5,9 @@ queries = require "lib/flows/pg"
 # / namespace is for notifications
 io.sockets.on "connection", (socket) ->
   socket.on "join", (id) ->
-    console.log id
-    
     # special case: "flows" is a channel for all radios.
     if id == "flows"
       socket.join "flows"
-      console.log "foo"
       return socket.emit "joined", "flows"
     
     id = parseInt id
