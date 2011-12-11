@@ -1,23 +1,23 @@
 {Radio} = require "schema/model"
-
-clean = (data) ->
-  fn = (label) ->
-    delete data[label] unless data[label]?
-  fn label for label of data
-  delete data.radio_id
-  return data
+{clean} = require "lib/flows/utils"
 
 exportRadio = (radio) ->
-  delete radio.user_id
+  delete radio.id
   radio.streams = (clean stream for stream in radio.streams)
   clean radio
 
 module.exports.getRadios = (param, fn) ->
-  Radio.find param, { 
-    order   : [ "name" ],
-    only    : [ "name", "token", "title", "artist", "genre", "description", "longitude", "latitude" ]
+  Radio.find param, {
+    order   : [ "name" ]
+    only    : [ 
+      "id", "name", "token", "website", 
+      "title", "artist", "genre", "description", 
+      "longitude", "latitude" 
+    ]
     include : { 
-      streams : only : [ "format", "url", "msg" ]
+      streams : {
+        only : [ "format", "url", "msg" ]
+      }
     }
   }, (err, radios) ->
   
