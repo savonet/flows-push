@@ -20,10 +20,10 @@
     socket.on('flows', function (msg) {
       document.getElementById("content").innerHTML+="Generic data: " + JSON.stringify(msg) + "</br>";
       if (radio === undefined) {
-        if (msg.data !== undefined && msg.data.id !== undefined) {
-          radio = "" + msg.data.id;
-          socket.emit('join', radio);
-          socket.on(radio, function (data) {
+        if (msg.data !== undefined && msg.data.token !== undefined) {
+          radio = msg.data.name;
+          socket.emit('join', msg.data.token);
+          socket.on(msg.data.token, function (data) {
             document.getElementById("content").innerHTML+="Data for radio " + radio + ": " + JSON.stringify(data) + "</br>";
           });
         }

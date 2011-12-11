@@ -1,22 +1,32 @@
 {io}    = require "lib/flows/io"
 redis   = require "lib/flows/redis"
-queries = require "lib/flows/pg"
+queries = require "lib/flows/queries"
 
 # / namespace is for notifications
 io.sockets.on "connection", (socket) ->
-  socket.on "join", (id) ->
+  socket.on "join", (token) ->
     # special case: "flows" is a channel for all radios.
-    if id == "flows"
+    all = token == "flows"
+
+    if all
       socket.join "flows"
       return socket.emit "joined", "flows"
-    
-    id = parseInt id
-    queries.radioById id, (radio, err) ->
-      if err?
-        return socket.emit "error", "Could not join requested notification channel: a radio with ID #{id} does not seem to exist."
-    
-      socket.join "#{id}"
-      socket.json.emit "joined", radio
+   
+    if all
+      d = new Date()
+      d.setHours(d.getHours()-1)
+      args =
+        "last_seen.gte" : d
+    else
+      args =
+        token : token
+
+    queries.getRadios args, (radios, err) ->
+      if err? or (not all and radios.length != 1)
+        return socket.emit "error", "Could not join requested notification channel: a radio with ID #{token} does not seem to exist."
+   
+      socket.join token
+      socket.json.emit "joined", (if all then radios else radios.shift())
 
 redis.on "message", (channel, message) ->
   msg = JSON.parse(message)
@@ -25,6 +35,6 @@ redis.on "message", (channel, message) ->
   io.sockets.in("flows").json.emit "flows", msg
 
   # Specific broadcast
-  if msg.data? and msg.data.id?
-    io.sockets.in("#{msg.data.id}").json.emit "#{msg.data.id}", msg
+  if msg.data? and msg.data.token?
+    io.sockets.in(msg.data.token).json.emit msg.data.token, msg
 

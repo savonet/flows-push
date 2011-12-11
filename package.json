@@ -9,8 +9,8 @@
     "connect-assets" : "2.1.4",
     "eco"            : "1.1.0-rc-1",
     "express"        : "2.5.1",
+    "FastLegS"       : "0.1.2",
     "ntwitter"       : "0.2.9",
-    "pg"             : "0.6.6",
     "redis"          : "0.7.1",
     "socket.io"      : "0.8.7",
     "underscore"     : "1.1.7"
