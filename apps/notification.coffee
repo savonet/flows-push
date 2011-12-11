@@ -35,6 +35,6 @@ redis.on "message", (channel, message) ->
   io.sockets.in("flows").json.emit "flows", msg
 
   # Specific broadcast
-  if msg.data? and msg.data.token?
-    io.sockets.in(msg.data.token).json.emit msg.data.token, msg
+  if msg.radio?.token
+    io.sockets.in(msg.radio.token).json.emit msg.radio.token, msg
 

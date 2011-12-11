@@ -7,11 +7,11 @@
     var socket = io.connect(url);
     var radio;
 
-    socket.on('joined', function (data) {
-      if (data === "flows") {
+    socket.on('joined', function (radio) {
+      if (radio === "flows") {
         document.getElementById("content").innerHTML+="Successfully joined flows notification channel.<br/>";
       } else {
-        document.getElementById("content").innerHTML+="Successfully joined notification channel for radio: " + JSON.stringify(data) + ".<br/>";
+        document.getElementById("content").innerHTML+="Successfully joined notification channel for radio: " + JSON.stringify(radio) + ".<br/>";
       }  
     });
 
@@ -20,10 +20,10 @@
     socket.on('flows', function (msg) {
       document.getElementById("content").innerHTML+="Generic data: " + JSON.stringify(msg) + "</br>";
       if (radio === undefined) {
-        if (msg.data !== undefined && msg.data.token !== undefined) {
-          radio = msg.data.name;
-          socket.emit('join', msg.data.token);
-          socket.on(msg.data.token, function (data) {
+        if (msg.radio !== undefined && msg.radio.token !== undefined) {
+          radio = msg.radio.name;
+          socket.emit("join", msg.radio.token);
+          socket.on(msg.radio.token, function (data) {
             document.getElementById("content").innerHTML+="Data for radio " + radio + ": " + JSON.stringify(data) + "</br>";
           });
         }

@@ -15,7 +15,7 @@ redis.on "message", (channel, message) ->
 
   msg = JSON.parse(message)
 
-  radio = msg.data
+  radio = msg.radio
 
   if msg.cmd == "metadata"
     # Reject metadata without title.
