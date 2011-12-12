@@ -7,10 +7,18 @@ Stream = FastLegS.Base.extend
   tableName  : "streams"
   primaryKey : "id"
 
-module.exports.Radio = FastLegS.Base.extend
+module.exports.Radio = Radio = FastLegS.Base.extend
   tableName  : "radios"
   primaryKey : "id"
   many       : [
     streams : Stream
     joinOn  : "radio_id"
+  ]
+
+module.exports.User = FastLegS.Base.extend
+  tableName  : "users"
+  primaryKey : "id"
+  many       : [
+    radios  : Radio
+    joinOn  : "user_id"
   ]
