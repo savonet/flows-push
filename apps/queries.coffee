@@ -5,10 +5,8 @@ queries = require "lib/flows/queries"
 app.get "/radio", (req, res) ->
   name    = req.query.name
   website = req.query.website
-  token   = req.query.token
 
-  params = {}
-  params.token   = token if token?
+  params         = {}
   params.name    = name if name?
   params.website = website if website?
 
