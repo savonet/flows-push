@@ -1,3 +1,4 @@
+_       = require "underscore"
 {app}   = require "lib/flows/express"
 queries = require "lib/flows/queries"
 
@@ -19,6 +20,31 @@ app.get "/radio", (req, res) ->
     res.header "Access-Control-Allow-Origin", "*"
     res.contentType "json"
     res.end JSON.stringify ans.shift()
+
+app.get "/radio/:token", (req, res) ->
+  queries.getRadios { token : req.params.token }, (ans, err) ->
+    return res.send("An error occured while processing your request", 500) if err?
+
+    return res.send "No such radio", 404 unless ans? and ans.length == 1
+
+    res.header "Access-Control-Allow-Origin", "*"
+    res.contentType "json"
+    res.end JSON.stringify ans.shift()
+
+app.get /^\/radio\/([^\/]+)\/(.+)$/, (req, res) ->
+  [token, format] = req.params
+
+  queries.getRadios { token : token }, (ans, err) ->
+    return res.send("An error occured while processing your request", 500) if err?
+
+    return res.send "No such radio", 404 unless ans? and ans.length == 1
+
+    radio = ans.shift()
+    stream = _.find radio.streams, (stream) -> stream.format == format
+
+    return res.send "No such stream", 404 unless stream?
+
+    res.redirect stream.url
 
 app.get "/radios", (req, res) ->
   d = new Date()

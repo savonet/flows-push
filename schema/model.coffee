@@ -1,6 +1,6 @@
 FastLegS = require "FastLegS"
 
-url = process.env.DATABASE_URL or "postgres://localhost:7778/flows"
+url = process.env.DATABASE_URL or "postgres://localhost/flows"
 FastLegS.connect url
 
 Stream = FastLegS.Base.extend

@@ -13,6 +13,6 @@
     "ntwitter"       : "0.2.9",
     "redis"          : "0.7.1",
     "socket.io"      : "0.8.7",
-    "underscore"     : "1.1.7"
+    "underscore"     : "1.2.3"
   }
 }
