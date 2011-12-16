@@ -17,7 +17,7 @@ app.get "/radio", (req, res) ->
 
     res.header "Access-Control-Allow-Origin", "*"
     res.contentType "json"
-    res.end JSON.stringify ans.shift()
+    res.end JSON.stringify queries.exportRadio(ans.shift())
 
 app.get "/radio/:token", (req, res) ->
   queries.getRadios { token : req.params.token }, (ans, err) ->
@@ -27,7 +27,7 @@ app.get "/radio/:token", (req, res) ->
 
     res.header "Access-Control-Allow-Origin", "*"
     res.contentType "json"
-    res.end JSON.stringify ans.shift()
+    res.end JSON.stringify queries.exportRadio(ans.shift())
 
 app.get /^\/radio\/([^\/]+)\/(.+)$/, (req, res) ->
   [token, format] = req.params
@@ -52,4 +52,4 @@ app.get "/radios", (req, res) ->
 
     res.header "Access-Control-Allow-Origin", "*"
     res.contentType "json"
-    res.end JSON.stringify ans
+    res.end JSON.stringify queries.exportRadios(ans)

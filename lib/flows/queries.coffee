@@ -1,10 +1,13 @@
 {Radio, User} = require "schema/model"
 {clean} = require "lib/flows/utils"
 
-exportRadio = (radio) ->
+module.exports.exportRadio = exportRadio = (radio) ->
   delete radio.id
   radio.streams = (clean stream for stream in radio.streams)
   clean radio
+
+module.exports.exportRadios = exportRadios = (radios) ->
+  exportRadio radio for radio in radios
 
 radiosParams =
   order   : [ "name" ]
@@ -26,9 +29,18 @@ module.exports.getRadios = (param, fn) ->
       return fn null, err
 
     radios = radios or []
-    radios = (exportRadio radio for radio in radios)
-
     fn radios, null
+
+module.exports.exportUser = exportUser = (user) ->
+  delete user.id
+  delete user.password
+  user.user = user.username
+  delete user.username
+  user.radios = exportRadios(user.radios or [])
+  clean user
+
+module.exports.exportUsers = (users) ->
+  exportUser user for user in users
 
 module.exports.getUsers = (param, fn) ->
   User.find param, {
@@ -45,11 +57,7 @@ module.exports.getUsers = (param, fn) ->
       return fn null, err
 
     users = users or []
-    for user in users
-      user.radios = user.radios or []
-      user.radios = (exportRadio radio for radio in user.radios)
-      user.user = user.username
-      delete user.username
-      delete user.id
-
     fn users, null
+
+module.exports.updateUser = (user, fn) ->
+  User.update user.id, user, fn
