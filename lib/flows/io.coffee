@@ -1,4 +1,4 @@
-{app}  = require "lib/flows/express"
+{app}  = require "./express"
 socket = require "socket.io"
 
 module.exports.io = io = socket.listen app

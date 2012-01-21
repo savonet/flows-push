@@ -1,7 +1,7 @@
-{io}    = require "lib/flows/io"
-redis   = require "lib/flows/redis"
-queries = require "lib/flows/queries"
-{clean} = require "lib/flows/utils"
+{io}    = require "../lib/flows/io"
+redis   = require "../lib/flows/redis"
+queries = require "../lib/flows/queries"
+{clean} = require "../lib/flows/utils"
 
 # / namespace is for notifications
 io.sockets.on "connection", (socket) ->

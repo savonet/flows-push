@@ -1,6 +1,6 @@
 _     = require "underscore"
-{io}  = require "lib/flows/io"
-{app} = require "lib/flows/express"
+{io}  = require "../lib/flows/io"
+{app} = require "../lib/flows/express"
 
 chat = io.of "/chat"
 

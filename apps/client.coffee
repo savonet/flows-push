@@ -1,7 +1,7 @@
 crypto  = require "crypto"
-{io}    = require "lib/flows/io"
-queries = require "lib/flows/queries"
-{clean} = require "lib/flows/utils"
+{io}    = require "../lib/flows/io"
+queries = require "../lib/flows/queries"
+{clean} = require "../lib/flows/utils"
 
 admin = io.of "/admin"
 

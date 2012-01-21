@@ -1,5 +1,5 @@
-{Radio, User} = require "schema/model"
-{clean} = require "lib/flows/utils"
+{Radio, User} = require "../../schema/model"
+{clean} = require "./utils"
 
 module.exports.exportRadio = exportRadio = (radio) ->
   delete radio.id

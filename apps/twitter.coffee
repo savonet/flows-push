@@ -1,6 +1,6 @@
-bitly   = require "lib/flows/bitly"
-twitter = require "lib/flows/twitter"
-redis   = require "lib/flows/redis"
+bitly   = require "../lib/flows/bitly"
+twitter = require "../lib/flows/twitter"
+redis   = require "../lib/flows/redis"
 
 # One update every 3 min..
 updateTimeout = 3*60*1000

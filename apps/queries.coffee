@@ -1,6 +1,6 @@
 _       = require "underscore"
-{app}   = require "lib/flows/express"
-queries = require "lib/flows/queries"
+{app}   = require "../lib/flows/express"
+queries = require "../lib/flows/queries"
 
 app.get "/radio", (req, res) ->
   name    = req.query.name
