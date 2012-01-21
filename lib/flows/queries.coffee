@@ -1,9 +1,14 @@
-{Radio, User} = require "../../schema/model"
-{clean} = require "./utils"
+{Listener, Radio, User} = require "../../schema/model"
+{clean}                 = require "./utils"
+{getPosition}           = require "./geoip"
+
+exportStream = (stream) ->
+  delete stream.id
+  clean stream
 
 module.exports.exportRadio = exportRadio = (radio) ->
   delete radio.id
-  radio.streams = (clean stream for stream in radio.streams)
+  radio.streams = (exportStream stream for stream in radio.streams)
   clean radio
 
 module.exports.exportRadios = exportRadios = (radios) ->
@@ -18,18 +23,42 @@ radiosParams =
   ]
   include : {
     streams : {
-      only : [ "format", "url", "msg" ]
+      only : [ "id", "format", "url", "msg" ]
     }
   }
 
 module.exports.getRadios = (param, fn) ->
   Radio.find param, radiosParams, (err, radios) ->
-  
-    if err?
-      return fn null, err
+    return fn null, err if err?
 
     radios = radios or []
     fn radios, null
+
+createListener = (stream, ip, fn) ->
+  getPosition ip, (data, err) ->
+    data ||=
+      latitude  : null
+      longitude : null
+
+    Listener.create {
+      stream_id : stream.id
+      ip        : ip
+      latitude  : data.latitude
+      longitude : data.longitude
+      last_seen : new Date() }, (err, result) ->
+        return fn null, err if err?
+        fn result, null
+
+module.exports.getListener = (stream, ip, fn) ->
+  Listener.findOne { 
+    stream_id : stream.id,
+    ip        : ip }, (err, listener) ->
+      return fn null, err if err?
+      return fn listener, null if listener?
+      createListener stream, ip, fn
+
+module.exports.updateListener = (listener) ->
+  Listener.update listener, { last_seen : new Date() }, ->
 
 module.exports.exportUser = exportUser = (user) ->
   delete user.id

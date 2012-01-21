@@ -7,6 +7,10 @@ Stream = FastLegS.Base.extend
   tableName  : "streams"
   primaryKey : "id"
 
+module.exports.Listener = FastLegS.Base.extend
+  tableName  : "listeners"
+  primaryKey : "id"
+
 module.exports.Radio = Radio = FastLegS.Base.extend
   tableName  : "radios"
   primaryKey : "id"

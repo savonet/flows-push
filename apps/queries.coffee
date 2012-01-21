@@ -42,6 +42,10 @@ app.get /^\/radio\/([^\/]+)\/(.+)$/, (req, res) ->
 
     return res.send "No such stream", 404 unless stream?
 
+    queries.getListener stream, req.connection.remoteAddress, (listener, err) ->
+      return if err? or not listener?
+      queries.updateListener listener
+
     res.redirect stream.url
 
 app.get "/radios", (req, res) ->
