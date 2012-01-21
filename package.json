@@ -1,6 +1,5 @@
 {
   "name": "flow-push",
-  
   "version": "0.0.1",
   
   "dependencies": {
@@ -10,7 +9,7 @@
     "eco"            : "1.1.0-rc-3",
     "express"        : "2.5.6",
     "FastLegS"       : "0.1.2",
-    "geoip-static"   : "0.4.5",
+    "geoip-static"   : "0.4.6",
     "ntwitter"       : "0.2.9-2",
     "redis"          : "0.7.1",
     "socket.io"      : "0.8.7",
