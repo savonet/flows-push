@@ -1,6 +1,7 @@
-{Listener, Radio, User} = require "../../schema/model"
-{clean}                 = require "./utils"
-{getPosition}           = require "./geoip"
+{Listener, Radio, 
+ Stream, User}     = require "../../schema/model"
+{clean}            = require "./utils"
+{getPosition}      = require "./geoip"
 
 exportStream = (stream) ->
   delete stream.id
@@ -34,6 +35,26 @@ module.exports.getRadios = (param, fn) ->
     radios = radios or []
     fn radios, null
 
+module.exports.getRadio = (param, fn) ->
+  Radio.find param, radiosParams, (err, radios) ->
+    return fn null, err if err?
+
+    fn radio, (radios.shift() || null)
+
+module.exports.updateRadio = (token, radio, fn) ->
+  Radio.update { token : token}, radio, fn
+
+module.exports.destroyRadio = (token, fn) ->
+  Radio.find { token : token }, radiosParams, (err, radios) ->
+    return fn err, null if err
+    return fn "No such radio", null unless radios?
+
+    radio = radios.shift()
+
+    Stream.destroy { radio_id : radio.id }, (err, results) ->
+      return fn err, null if err
+      Radio.destroy { token : token }, fn
+
 createListener = (stream, ip, fn) ->
   getPosition ip, (data, err) ->
     data ||=
@@ -50,11 +71,11 @@ createListener = (stream, ip, fn) ->
         fn result, null
 
 module.exports.getListener = (stream, ip, fn) ->
-  Listener.findOne { 
+  Listener.find { 
     stream_id : stream.id,
-    ip        : ip }, (err, listener) ->
+    ip        : ip }, (err, listeners) ->
       return fn null, err if err?
-      return fn listener, null if listener?
+      return fn listeners.shift(), null if listeners?
       createListener stream, ip, fn
 
 module.exports.updateListener = (listener) ->
@@ -71,7 +92,7 @@ module.exports.exportUser = exportUser = (user) ->
 module.exports.exportUsers = (users) ->
   exportUser user for user in users
 
-module.exports.getUsers = (param, fn) ->
+module.exports.getUser = (param, fn) ->
   User.find param, {
     only    : [
       "id", "username", "password", "email",
@@ -85,8 +106,9 @@ module.exports.getUsers = (param, fn) ->
     if err?
       return fn null, err
 
-    users = users or []
-    fn users, null
+    user = users.shift() || null
+
+    fn user, null
 
 module.exports.updateUser = (user, fn) ->
   User.update user.id, user, fn

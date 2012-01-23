@@ -3,7 +3,7 @@ FastLegS = require "FastLegS"
 url = process.env.DATABASE_URL or "postgres://localhost/flows"
 FastLegS.connect url
 
-Stream = FastLegS.Base.extend
+module.exports.Stream = Stream = FastLegS.Base.extend
   tableName  : "streams"
   primaryKey : "id"
 

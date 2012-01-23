@@ -1,3 +1,4 @@
+_       = require "underscore"
 crypto  = require "crypto"
 {io}    = require "../lib/flows/io"
 queries = require "../lib/flows/queries"
@@ -13,18 +14,50 @@ admin.on "connection", (socket) ->
       username : user
       password : crypto.createHash("sha224").update(password).digest(encoding="hex")
 
-    queries.getUsers params, (users, err) ->
-      if err? or users.length != 1
+    queries.getUser params, (user, err) ->
+      if err? or not user?
         return socket.emit "error", "Sign-in failed!"
 
-
-      user = users.shift()
       user.last_seen = new Date()
       user.last_ip   = socket.handshake.address.address
 
       queries.updateUser user, (err) ->
         socket.emit "error", "Sign-in failed!" if err?
 
-        socket.user = queries.exportUser user
-        return socket.emit "signed-in", socket.user
+        socket.user = _.clone user
+        return socket.emit "signed-in", queries.exportUser(user)
 
+  socket.on "get-user", ->
+    return socket.emit "error", "You are not signed-in!" unless socket.user?
+    queries.getUser { id : socket.user.id }, (user, err) ->
+      return socket.emit "error" if err?
+      socket.user = _.clone user
+      socket.emit "user", queries.exportUser(user)
+
+  socket.on "edit-radio", (radio) ->
+    return socket.emit "error", "You are not signed-in!" unless socket.user?
+
+    ok = _.any socket.user.radios, (check) ->
+      radio.token == check.token
+    return socket.emit "error", "No such radio!" unless ok
+
+    queries.updateRadio radio.token, radio, (err, results) ->
+      return socket.emit "error", err if err?
+
+      return socket.emit "error", "Update failed" unless results == 1
+
+      socket.emit "edited-radio"
+
+  socket.on "delete-radio", (token) ->
+    return socket.emit "error", "You are not signed-in!" unless socket.user?
+
+    ok = _.any socket.user.radios, (radio) ->
+      radio.token == token
+    return socket.emit "error", "No such radio!" unless ok
+
+    queries.destroyRadio token, (err, results) ->
+      return socket.emit "error", err if err?
+
+      return socket.emit "error", "Delete failed" unless results == 1
+
+      socket.emit "deleted-radio"

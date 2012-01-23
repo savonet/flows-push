@@ -10,34 +10,33 @@ app.get "/radio", (req, res) ->
   params.name    = name if name?
   params.website = website if website?
 
-  queries.getRadios params, (ans, err) ->
+  queries.getRadio params, (radio, err) ->
     return res.send("An error occured while processing your request", 500) if err?
 
-    return res.send "No such radio", 404 unless ans? and ans.length == 1
+    return res.send "No such radio", 404 unless radio?
 
     res.header "Access-Control-Allow-Origin", "*"
     res.contentType "json"
-    res.end JSON.stringify queries.exportRadio(ans.shift())
+    res.end JSON.stringify queries.exportRadio(radio)
 
 app.get "/radio/:token", (req, res) ->
-  queries.getRadios { token : req.params.token }, (ans, err) ->
+  queries.getRadio { token : req.params.token }, (radio, err) ->
     return res.send("An error occured while processing your request", 500) if err?
 
-    return res.send "No such radio", 404 unless ans? and ans.length == 1
+    return res.send "No such radio", 404 unless radio?
 
     res.header "Access-Control-Allow-Origin", "*"
     res.contentType "json"
-    res.end JSON.stringify queries.exportRadio(ans.shift())
+    res.end JSON.stringify queries.exportRadio(radio)
 
 app.get /^\/radio\/([^\/]+)\/(.+)$/, (req, res) ->
   [token, format] = req.params
 
-  queries.getRadios { token : token }, (ans, err) ->
+  queries.getRadio { token : token }, (radio, err) ->
     return res.send("An error occured while processing your request", 500) if err?
 
-    return res.send "No such radio", 404 unless ans? and ans.length == 1
+    return res.send "No such radio", 404 unless radio?
 
-    radio = ans.shift()
     stream = _.find radio.streams, (stream) -> stream.format == format
 
     return res.send "No such stream", 404 unless stream?
