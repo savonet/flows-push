@@ -39,7 +39,7 @@ module.exports.getRadio = (param, fn) ->
   Radio.find param, radiosParams, (err, radios) ->
     return fn null, err if err?
 
-    fn radio, (radios.shift() || null)
+    fn (radios.shift() || null), null
 
 module.exports.updateRadio = (token, radio, fn) ->
   Radio.update { token : token}, radio, fn
