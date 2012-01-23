@@ -18,8 +18,13 @@ admin.on "connection", (socket) ->
       if err? or not user?
         return socket.emit "error", "Sign-in failed!"
 
+      forwardedIpsStr = socket.handshake.headers["x-forwarded-for"]
+      if forwardedIpsStr?
+        [address] = forwardedIpsStr.split ","
+      address = address || socket.handshake.address.address
+
       user.last_seen = new Date()
-      user.last_ip   = socket.handshake.address.address
+      user.last_ip   = address
 
       queries.updateUser user, (err) ->
         socket.emit "error", "Sign-in failed!" if err?
