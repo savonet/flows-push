@@ -1,3 +1,4 @@
+_                  = require "underscore"
 {Listener, Radio, 
  Stream, User}     = require "../../schema/model"
 {clean}            = require "./utils"
@@ -29,27 +30,25 @@ radiosParams =
   }
 
 module.exports.getRadios = (param, fn) ->
-  Radio.find param, radiosParams, (err, radios) ->
+  Radio.find param, _.clone(radiosParams), (err, radios) ->
     return fn null, err if err?
 
     radios = radios or []
     fn radios, null
 
 module.exports.getRadio = (param, fn) ->
-  Radio.find param, radiosParams, (err, radios) ->
+  Radio.findOne param, _.clone(radiosParams), (err, radio) ->
     return fn null, err if err?
 
-    fn (radios.shift() || null), null
+    fn radio, null
 
 module.exports.updateRadio = (token, radio, fn) ->
   Radio.update { token : token}, radio, fn
 
 module.exports.destroyRadio = (token, fn) ->
-  Radio.find { token : token }, radiosParams, (err, radios) ->
+  Radio.findOne { token : token }, _.clone(radiosParams), (err, radio) ->
     return fn err, null if err
-    return fn "No such radio", null unless radios?
-
-    radio = radios.shift()
+    return fn "No such radio", null unless radio?
 
     Stream.destroy { radio_id : radio.id }, (err, results) ->
       return fn err, null if err
@@ -71,15 +70,15 @@ createListener = (stream, ip, fn) ->
         fn result, null
 
 module.exports.getListener = (stream, ip, fn) ->
-  Listener.find { 
+  Listener.findOne { 
     stream_id : stream.id,
-    ip        : ip }, (err, listeners) ->
+    ip        : ip }, (err, listener) ->
       return fn null, err if err?
-      return fn listeners.shift(), null if listeners?
+      return fn listener, null if listener?
       createListener stream, ip, fn
 
 module.exports.updateListener = (listener) ->
-  Listener.update listener, { last_seen : new Date() }, ->
+  Listener.update { id : listener.id }, { last_seen : new Date() }, ->
 
 module.exports.exportUser = exportUser = (user) ->
   delete user.id
