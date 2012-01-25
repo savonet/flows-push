@@ -3,6 +3,7 @@ crypto  = require "crypto"
 {io}    = require "../lib/flows/io"
 queries = require "../lib/flows/queries"
 {clean} = require "../lib/flows/utils"
+twitter = require "../lib/flows/twitter"
 
 admin = io.of "/admin"
 
@@ -29,15 +30,15 @@ admin.on "connection", (socket) ->
       queries.updateUser user, (err) ->
         socket.emit "error", "Sign-in failed!" if err?
 
-        socket.user = _.clone user
-        return socket.emit "signed-in", queries.exportUser(user)
+        socket.user = user
+        socket.emit "signed-in", queries.exportUser(socket.user)
 
   socket.on "get-user", ->
     return socket.emit "error", "You are not signed-in!" unless socket.user?
     queries.getUser { id : socket.user.id }, (user, err) ->
       return socket.emit "error" if err?
-      socket.user = _.clone user
-      socket.emit "user", queries.exportUser(user)
+      socket.user = user
+      socket.emit "user", queries.exportUser(socket.user)
 
   socket.on "edit-radio", (radio) ->
     return socket.emit "error", "You are not signed-in!" unless socket.user?
@@ -66,3 +67,45 @@ admin.on "connection", (socket) ->
       return socket.emit "error", "Delete failed" unless results == 1
 
       socket.emit "deleted-radio"
+
+  socket.on "auth-twitter", (token) ->
+    return socket.emit "error", "You are not signed-in!" unless socket.user?
+
+    radio = _.find socket.user.radios, (radio) ->
+      radio.token == token
+    return socket.emit "error", "No such radio!" unless radio?
+
+    twitter.getRequest "oob", (err, request) ->
+      return socket.emit "error", err if err?
+
+      socket.json.emit "confirm-twitter",
+        token : request.token
+        url   : request.url
+
+      socket.on request.token, (verifier) ->
+        twitter.getAccess request, verifier, (err, access) ->
+          return socket.emit "error", err if err?
+
+          queries.updateTwitter radio, access, (twitter, err) ->
+              return socket.emit "error", err if err?
+
+              socket.emit "authenticated-twitter", access.name
+
+  socket.on "delete-twitter", (opts) ->
+    return socket.emit "error", "You are not signed-in!" unless socket.user?
+
+    radio = _.find socket.user.radios, (radio) ->
+      radio.token == opts.token
+    return socket.emit "error", "No such radio!" unless radio?
+
+    ok = _.any radio.twitters, (twitter) -> twitter.name == opts.name
+    return socket.emit "error", "Twitter account not authenticated for that radio!" unless ok
+
+    queries.destroyTwitter radio, opts.name, (err, results) ->
+      return socket.emit "error", err if err?
+
+      return socket.emit "error", "Delete failed" unless results == 1
+
+      console.log "gni"
+
+      socket.emit "deleted-twitter"

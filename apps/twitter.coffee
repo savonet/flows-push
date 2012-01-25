@@ -1,13 +1,7 @@
 bitly   = require "../lib/flows/bitly"
 twitter = require "../lib/flows/twitter"
+queries = require "../lib/flows/queries"
 redis   = require "../lib/flows/redis"
-
-# One update every 3 min..
-updateTimeout = 3*60*1000
-latestUpdate = new Date()
-
-# Allow first update
-latestUpdate.setTime latestUpdate.getTime() - updateTimeout
 
 redis.on "message", (channel, message) ->
   now = new Date()
@@ -21,45 +15,44 @@ redis.on "message", (channel, message) ->
     # Reject metadata without title.
     return unless radio.title?
 
-    if radio.artist? and radio.artist != ""
-      metadata = "#{radio.title} by #{radio.artist}"
-    else
-      metadata = radio.title
+    queries.getTwitters radio, (twitters, err) ->
+      return console.log "Error getting twitters: #{err}" if err?
+      return unless twitters? and twitters.length > 0
 
-    status = "On #{radio.name}: #{metadata}"
-
-    getUrl = (fn) ->
-      if radio.website?
-        bitly radio.website, (shortUrl, err) ->
-          if err?
-            console.error "Bit.ly error: #{err}"
-            
-          return fn "" if err? or not shortUrl?
-            
-          fn " #{shortUrl}"
-
+      if radio.artist? and radio.artist != ""
+        metadata = "#{radio.title} by #{radio.artist}"
       else
-        fn ""
+        metadata = radio.title
 
-    params = {}
+      status = "On #{radio.name}: #{metadata}"
 
-    if radio.longitude? and radio.latitude?
-      lat = parseInt radio.latitude
-      long = parseInt radio.longitude
-      params.coordinates = [lat, long]
+      getUrl = (fn) ->
+        if radio.website?
+          bitly radio.website, (shortUrl, err) ->
+            if err?
+              console.error "Bit.ly error: #{err}"
+            
+            return fn "" if err? or not shortUrl?
+              
+            fn " #{shortUrl}"
 
-    getUrl (url) ->
-      end = " #savonetflows#{url}"
+        else
+          fn ""
 
-      if status.length + end.length > 140
-        # We cut the status and add ".."
-        len = 140 - end.length - 2
-        status = "#{status.slice 0, len}.."
+      params = {}
 
-      status = "#{status} #savonetflows#{url}"
+      if radio.longitude? and radio.latitude?
+        lat = parseInt radio.latitude
+        long = parseInt radio.longitude
+        params.coordinates = [lat, long]
 
-      twitter.updateStatus status, (err, data) ->
-        if err?
-          return console.error "Error while updating twitter status: #{err}"
+      getUrl (url) ->
+        end = " #savonetflows#{url}"
 
-        latestUpdate = now
+        if status.length + end.length > 140
+          # We cut the status and add ".."
+          len = 140 - end.length - 2
+          status = "#{status.slice 0, len}.."
+
+        status = "#{status} #savonetflows#{url}"
+        twitter.updateStatus client, status for client in twitters

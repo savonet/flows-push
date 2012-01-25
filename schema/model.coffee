@@ -11,12 +11,18 @@ module.exports.Listener = FastLegS.Base.extend
   tableName  : "listeners"
   primaryKey : "id"
 
+module.exports.Twitter = Twitter = FastLegS.Base.extend
+  tableName  : "twitters"
+  primaryKey : "id"
+
 module.exports.Radio = Radio = FastLegS.Base.extend
   tableName  : "radios"
   primaryKey : "id"
-  many       : [
-    streams : Stream
-    joinOn  : "radio_id"
+  many       : [ {
+    streams : Stream,
+    joinOn  : "radio_id" },{
+    twitters  : Twitter,
+    joinOn    : "radio_id" }
   ]
 
 module.exports.User = FastLegS.Base.extend
