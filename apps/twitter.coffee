@@ -15,7 +15,7 @@ redis.on "message", (channel, message) ->
     # Reject metadata without title.
     return unless radio.title?
 
-    queries.getRadio { token : radio.token }, (radio, err) ->
+    queries.getRadio { token : radio.token }, (err, radio) ->
       return console.log "Error getting radio: #{err}" if err?
       return unless radio.twitters? and radio.twitters.length > 0
 
@@ -28,7 +28,7 @@ redis.on "message", (channel, message) ->
 
       getUrl = (fn) ->
         if radio.website?
-          bitly radio.website, (shortUrl, err) ->
+          bitly radio.website, (err, shortUrl) ->
             if err?
               console.error "Bit.ly error: #{err}"
             

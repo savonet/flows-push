@@ -10,7 +10,7 @@ app.get "/radio", (req, res) ->
   params.name    = name if name?
   params.website = website if website?
 
-  queries.getRadio params, (radio, err) ->
+  queries.getRadio params, (err, radio) ->
     return res.send("An error occured while processing your request", 500) if err?
 
     return res.send "No such radio", 404 unless radio?
@@ -20,7 +20,7 @@ app.get "/radio", (req, res) ->
     res.end JSON.stringify queries.exportRadio(radio)
 
 app.get "/radio/:token", (req, res) ->
-  queries.getRadio { token : req.params.token }, (radio, err) ->
+  queries.getRadio { token : req.params.token }, (err, radio) ->
     return res.send("An error occured while processing your request", 500) if err?
 
     return res.send "No such radio", 404 unless radio?
@@ -32,7 +32,7 @@ app.get "/radio/:token", (req, res) ->
 app.get /^\/radio\/([^\/]+)\/(.+)$/, (req, res) ->
   [token, format] = req.params
 
-  queries.getRadio { token : token }, (radio, err) ->
+  queries.getRadio { token : token }, (err, radio) ->
     return res.send("An error occured while processing your request", 500) if err?
 
     return res.send "No such radio", 404 unless radio?
@@ -41,7 +41,7 @@ app.get /^\/radio\/([^\/]+)\/(.+)$/, (req, res) ->
 
     return res.send "No such stream", 404 unless stream?
 
-    queries.getListener stream, req.connection.remoteAddress, (listener, err) ->
+    queries.getListener stream, req.connection.remoteAddress, (err, listener) ->
       return if err? or not listener?
       queries.updateListener listener
 
@@ -50,7 +50,7 @@ app.get /^\/radio\/([^\/]+)\/(.+)$/, (req, res) ->
 app.get "/radios", (req, res) ->
   d = new Date()
   d.setHours(d.getHours()-1)
-  queries.getRadios { "last_seen.gte" : d }, (ans, err) ->
+  queries.getRadios { "last_seen.gte" : d }, (err, ans) ->
     return res.send("An error occured while processing your request", 500) if err?
 
     res.header "Access-Control-Allow-Origin", "*"

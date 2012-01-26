@@ -15,7 +15,7 @@ admin.on "connection", (socket) ->
       username : user
       password : crypto.createHash("sha224").update(password).digest(encoding="hex")
 
-    queries.getUser params, (user, err) ->
+    queries.getUser params, (err, user) ->
       if err? or not user?
         return socket.emit "error", "Sign-in failed!"
 
@@ -35,8 +35,8 @@ admin.on "connection", (socket) ->
 
   socket.on "get-user", ->
     return socket.emit "error", "You are not signed-in!" unless socket.user?
-    queries.getUser { id : socket.user.id }, (user, err) ->
-      return socket.emit "error" if err?
+    queries.getUser { id : socket.user.id }, (err, user) ->
+      return socket.emit "error", err if err?
       socket.user = user
       socket.emit "user", queries.exportUser(socket.user)
 
@@ -86,7 +86,7 @@ admin.on "connection", (socket) ->
         twitter.getAccess request, verifier, (err, access) ->
           return socket.emit "error", err if err?
 
-          queries.updateTwitter radio, access, (result, err) ->
+          queries.updateTwitter radio, access, (err, result) ->
               return socket.emit "error", err if err?
 
               twitter.clients[access.name] = null

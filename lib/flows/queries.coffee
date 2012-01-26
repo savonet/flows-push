@@ -4,7 +4,7 @@ _                  = require "underscore"
  TwittersRadios,
  User}             = require "../../schema/model"
 {clean}            = require "./utils"
-{getPosition}      = require "./geoip"
+{getCity}          = require "./geoip"
 
 exportStream = (stream) ->
   stream = _.clone stream
@@ -40,17 +40,10 @@ radiosParams =
   }
 
 module.exports.getRadios = (param, fn) ->
-  Radio.find param, _.clone(radiosParams), (err, radios) ->
-    return fn null, err if err?
-
-    radios = radios or []
-    fn radios, null
+  Radio.find param, _.clone(radiosParams), fn
 
 module.exports.getRadio = (param, fn) ->
-  Radio.findOne param, _.clone(radiosParams), (err, radio) ->
-    return fn null, err if err?
-
-    fn radio, null
+  Radio.findOne param, _.clone(radiosParams), fn
 
 module.exports.updateRadio = (token, radio, fn) ->
   Radio.update { token : token}, radio, fn
@@ -65,7 +58,7 @@ module.exports.destroyRadio = (token, fn) ->
       Radio.destroy { token : token }, fn
 
 createListener = (stream, ip, fn) ->
-  getPosition ip, (data, err) ->
+  getCity ip, (err, data) ->
     data ||=
       latitude  : null
       longitude : null
@@ -76,15 +69,15 @@ createListener = (stream, ip, fn) ->
       latitude  : data.latitude
       longitude : data.longitude
       last_seen : new Date() }, (err, result) ->
-        return fn null, err if err?
+        return fn err, null if err?
         fn result, null
 
 module.exports.getListener = (stream, ip, fn) ->
   Listener.findOne { 
     stream_id : stream.id,
     ip        : ip }, (err, listener) ->
-      return fn null, err if err?
-      return fn listener, null if listener?
+      return fn err, null if err?
+      return fn null, listener if listener?
       createListener stream, ip, fn
 
 module.exports.updateListener = (listener) ->
@@ -103,35 +96,32 @@ assocTwitter = (radio, twitter, fn) ->
   TwittersRadios.create {
     twitter_id : twitter.id
     radio_id   : radio.id }, (err, result) ->
-      return fn null, err if err?
-      fn twitter, null
+      return fn err, null if err?
+      fn null, twitter
 
 module.exports.updateTwitter = (radio, access, fn) ->
   Twitter.findOne { name: access.name }, {
     include : {
       radios : { only : ["token"] } 
     } }, (err, twitter) ->
-    return fn null, err if err?
+    return fn err, null if err?
 
     if twitter?
       Twitter.update { id : twitter.id }, {
         token  : access.token
         secret : access.secret }, (err, result) ->
-        return fn null, err if err?
+        return fn err, null if err?
         assocTwitter radio, twitter, fn
     else
       createTwitter radio, access, (err, result) ->
-        return fn null, err if err?
+        return fn err, null if err?
         [twitter] = result.rows
         assocTwitter radio, twitter, fn
 
 module.exports.destroyRadioTwitter = (radio, twitter, fn) ->
   TwittersRadios.destroy { 
     twitter_id : twitter.id,
-    radio_id   : radio.id }, (err, result) ->
-    return fn err if err?
-    
-    fn err
+    radio_id   : radio.id }, fn
 
 module.exports.updateListener = (listener) ->
   Listener.update { id : listener.id }, { last_seen : new Date() }, ->
@@ -157,12 +147,7 @@ module.exports.getUser = (param, fn) ->
     include : {
       radios : _.clone radiosParams
     }
-  }, (err, user) ->
-
-    if err?
-      return fn null, err
-
-    fn user, null
+  }, fn
 
 module.exports.updateUser = (user, fn) ->
   User.update user.id, user, fn

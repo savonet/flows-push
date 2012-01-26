@@ -22,7 +22,7 @@ io.sockets.on "connection", (socket) ->
       args =
         token : token
 
-    queries.getRadios args, (radios, err) ->
+    queries.getRadios args, (err, radios) ->
       if err? or (not all and radios.length != 1)
         return socket.emit "error", "Could not join requested notification channel: a radio with ID #{token} does not seem to exist."
    
