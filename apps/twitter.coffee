@@ -15,9 +15,9 @@ redis.on "message", (channel, message) ->
     # Reject metadata without title.
     return unless radio.title?
 
-    queries.getTwitters radio, (twitters, err) ->
-      return console.log "Error getting twitters: #{err}" if err?
-      return unless twitters? and twitters.length > 0
+    queries.getRadio { token : radio.token }, (radio, err) ->
+      return console.log "Error getting radio: #{err}" if err?
+      return unless radio.twitters? and radio.twitters.length > 0
 
       if radio.artist? and radio.artist != ""
         metadata = "#{radio.title} by #{radio.artist}"
@@ -55,4 +55,4 @@ redis.on "message", (channel, message) ->
           status = "#{status.slice 0, len}.."
 
         status = "#{status} #savonetflows#{url}"
-        twitter.updateStatus client, status for client in twitters
+        twitter.updateStatus client, status for client in radio.twitters

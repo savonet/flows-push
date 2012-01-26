@@ -1,7 +1,7 @@
 {OAuth} = require "oauth"
 twitter = require "ntwitter"
 
-clients = {}
+module.exports.clients = clients = {}
 
 getClient = (opts, fn) ->
   return fn clients[opts.name] if clients[opts.name]?

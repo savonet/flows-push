@@ -86,8 +86,10 @@ admin.on "connection", (socket) ->
         twitter.getAccess request, verifier, (err, access) ->
           return socket.emit "error", err if err?
 
-          queries.updateTwitter radio, access, (twitter, err) ->
+          queries.updateTwitter radio, access, (result, err) ->
               return socket.emit "error", err if err?
+
+              twitter.clients[access.name] = null
 
               socket.emit "authenticated-twitter", access.name
 
@@ -98,14 +100,10 @@ admin.on "connection", (socket) ->
       radio.token == opts.token
     return socket.emit "error", "No such radio!" unless radio?
 
-    ok = _.any radio.twitters, (twitter) -> twitter.name == opts.name
-    return socket.emit "error", "Twitter account not authenticated for that radio!" unless ok
+    twitter = _.find radio.twitters, (twitter) -> twitter.name == opts.name
+    return socket.emit "error", "Twitter account not authenticated for that radio!" unless twitter?
 
-    queries.destroyTwitter radio, opts.name, (err, results) ->
+    queries.destroyRadioTwitter radio, twitter, (err) ->
       return socket.emit "error", err if err?
-
-      return socket.emit "error", "Delete failed" unless results == 1
-
-      console.log "gni"
 
       socket.emit "deleted-twitter"

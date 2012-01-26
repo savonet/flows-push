@@ -1,6 +1,7 @@
 _                  = require "underscore"
 {Listener, Radio, 
  Stream, Twitter, 
+ TwittersRadios,
  User}             = require "../../schema/model"
 {clean}            = require "./utils"
 {getPosition}      = require "./geoip"
@@ -34,7 +35,7 @@ radiosParams =
       only : [ "id", "format", "url", "msg" ]
     }
     twitters : {
-      only : [ "id", "name" ]
+      only : [ "id", "name", "token", "secret" ]
     }
   }
 
@@ -91,40 +92,46 @@ module.exports.updateListener = (listener) ->
 
 createTwitter = (radio, access, fn) ->
   Twitter.create {
-    radio_id : radio.id
     name     : access.name
     token    : access.token
-    secret   : access.secret }, (err, result) ->
-      return fn null, err if err?
-      fn result, null
+    secret   : access.secret }, fn
 
-module.exports.getTwitters = (radio, fn) ->
-  Radio.findOne { token : radio.token }, (err, radio) ->
-    return fn null, err if err?
-    return fn null, null unless radio?
+assocTwitter = (radio, twitter, fn) ->
+  ok = twitter.radios? and _.any twitter.radios, (e) -> e.token == radio.token
+  return fn twitter, null if ok
 
-    Twitter.find { radio_id : radio.id }, (err, twitters) ->
+  TwittersRadios.create {
+    twitter_id : twitter.id
+    radio_id   : radio.id }, (err, result) ->
       return fn null, err if err?
-      fn twitters, null
+      fn twitter, null
 
 module.exports.updateTwitter = (radio, access, fn) ->
-  Twitter.findOne { radio_id : radio.id, name: access.name }, (err, twitter) ->
-      return fn null, err if err?
+  Twitter.findOne { name: access.name }, {
+    include : {
+      radios : { only : ["token"] } 
+    } }, (err, twitter) ->
+    return fn null, err if err?
 
-      if twitter?
-        return Twitter.update { id : twitter.id }, {
-          token  : access.token
-          secret : access.secret }, (err, result) ->
-          return fn null, err if err?
-          fn result, null
- 
-      createTwitter radio, access, fn
+    if twitter?
+      Twitter.update { id : twitter.id }, {
+        token  : access.token
+        secret : access.secret }, (err, result) ->
+        return fn null, err if err?
+        assocTwitter radio, twitter, fn
+    else
+      createTwitter radio, access, (err, result) ->
+        return fn null, err if err?
+        [twitter] = result.rows
+        assocTwitter radio, twitter, fn
 
-module.exports.destroyTwitter = (radio, name, fn) ->
-  console.log "foo"
-  Twitter.destroy {
-    radio_id : radio.id
-    name     : name }, fn
+module.exports.destroyRadioTwitter = (radio, twitter, fn) ->
+  TwittersRadios.destroy { 
+    twitter_id : twitter.id,
+    radio_id   : radio.id }, (err, result) ->
+    return fn err if err?
+    
+    fn err
 
 module.exports.updateListener = (listener) ->
   Listener.update { id : listener.id }, { last_seen : new Date() }, ->
