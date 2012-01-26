@@ -100,10 +100,10 @@ admin.on "connection", (socket) ->
       radio.token == opts.token
     return socket.emit "error", "No such radio!" unless radio?
 
-    twitter = _.find radio.twitters, (twitter) -> twitter.name == opts.name
-    return socket.emit "error", "Twitter account not authenticated for that radio!" unless twitter?
+    client = _.find radio.twitters, (twitter) -> twitter.name == opts.name
+    return socket.emit "error", "Twitter account not authenticated for that radio!" unless client?
 
-    queries.destroyRadioTwitter radio, twitter, (err) ->
+    queries.destroyRadioTwitter radio, client, (err) ->
       return socket.emit "error", err if err?
 
       socket.emit "deleted-twitter"
