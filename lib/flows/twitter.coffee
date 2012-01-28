@@ -48,7 +48,15 @@ module.exports.getRequest = (callback, fn) ->
       url    : "https://api.twitter.com/oauth/authenticate?oauth_token=#{oauth_token}"
 
 module.exports.getAccess = (request, verifier, fn) ->
-  request.oa.getOAuthAccessToken request.token, request.secret, verifier, (error, oauth_access_token, oauth_access_token_secret, results) ->
+  oa = new OAuth request.oa._requestUrl,
+                 request.oa._accessUrl,
+                 request.oa._consumerKey,
+                 request.oa._consumerSecret,
+                 request.oa._version,
+                 request.oa._authorize_callback,
+                 request.oa._signatureMethod
+  
+  oa.getOAuthAccessToken request.token, request.secret, verifier, (error, oauth_access_token, oauth_access_token_secret, results) ->
     return fn error, null if error?
 
     fn null,

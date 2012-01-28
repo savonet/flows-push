@@ -1,7 +1,7 @@
 _                  = require "underscore"
 {Listener, Radio, 
  Stream, Twitter, 
- TwittersRadios,
+ TwitterRadio,
  User}             = require "../../schema/model"
 {clean}            = require "./utils"
 {getCity}          = require "./geoip"
@@ -91,9 +91,9 @@ createTwitter = (radio, access, fn) ->
 
 assocTwitter = (radio, twitter, fn) ->
   ok = twitter.radios? and _.any twitter.radios, (e) -> e.token == radio.token
-  return fn twitter, null if ok
+  return fn null, twitter if ok
 
-  TwittersRadios.create {
+  TwitterRadio.create {
     twitter_id : twitter.id
     radio_id   : radio.id }, (err, result) ->
       return fn err, null if err?
@@ -119,7 +119,7 @@ module.exports.updateTwitter = (radio, access, fn) ->
         assocTwitter radio, twitter, fn
 
 module.exports.destroyRadioTwitter = (radio, twitter, fn) ->
-  TwittersRadios.destroy { 
+  TwitterRadio.destroy { 
     twitter_id : twitter.id,
     radio_id   : radio.id }, fn
 
