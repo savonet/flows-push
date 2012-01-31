@@ -1,8 +1,8 @@
-_          = require "underscore"
-{app,host} = require "../lib/flows/express"
-queries    = require "../lib/flows/queries"
-twitter    = require "../lib/flows/twitter"
-url        = require "url"
+_               = require "underscore"
+{app,auth,host} = require "../lib/flows/express"
+queries         = require "../lib/flows/queries"
+twitter         = require "../lib/flows/twitter"
+url             = require "url"
 
 app.get "/radio", (req, res) ->
   name    = req.query.name
@@ -36,11 +36,15 @@ app.get "/radio/:token", (req, res) ->
 
 twitterCallback = (token) -> "/radio/#{token}/twitter/confirm"
 
-app.get "/radio/:token/twitter/auth", (req, res) ->
+app.get "/radio/:token/twitter/auth", auth, (req, res) ->
   queries.getRadio { token : req.params.token }, (err, radio) ->
     return res.send("An error occured while processing your request", 500) if err?
 
     return res.send "No such radio", 404 unless radio?
+
+    ok = _.any req.user.radios, (check) ->
+            radio.token == check.token
+    return res.send "Radio #{radio.token} does not belong to user #{user.username}" unless ok
 
     twitter.getRequest "#{host}#{twitterCallback radio.token}", (err, request) ->
       return res.send("An error occured while processing your request", 500) if err?
