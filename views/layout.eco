@@ -7,7 +7,7 @@
   <link href="css/new.css" type="text/css" rel="stylesheet" />
   <script type="text/javascript" src="http://www.google.com/jsapi"></script>
   <script>
-    google.load("jquery", "1.6.1");
+    google.load("jquery", "1.7.1");
   </script>
 </head>
 <body>

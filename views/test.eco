@@ -4,24 +4,30 @@
     var socket = io.connect(url);
     var radio;
 
+    function appendData(text, msg) {
+      $("#content").append(text + "<br/>");
+      var el = $("<pre>" + JSON.stringify(msg, undefined, "  ") + "</pre>");
+      $("#content").append(el);
+    }
+
     socket.on('joined', function (radio) {
       if (radio === "flows") {
-        document.getElementById("content").innerHTML+="Successfully joined flows notification channel.<br/>";
+        $("#content").append("Successfully joined flows notification channel.<br/>");
       } else {
-        document.getElementById("content").innerHTML+="Successfully joined notification channel for radio: " + JSON.stringify(radio) + ".<br/>";
+        appendData("Successfully joined a notification channel.", radio);
       }  
     });
 
     socket.emit('join', 'flows');
     
     socket.on('flows', function (msg) {
-      document.getElementById("content").innerHTML+="Generic data: " + JSON.stringify(msg) + "</br>";
+      appendData("Generic data", msg);
       if (radio === undefined) {
         if (msg.radio !== undefined && msg.radio.token !== undefined) {
           radio = msg.radio.name;
           socket.emit("join", msg.radio.token);
           socket.on(msg.radio.token, function (data) {
-            document.getElementById("content").innerHTML+="Data for radio " + radio + ": " + JSON.stringify(data) + "</br>";
+             appendData("Data for radio " + radio, data);           
           });
         }
       }
