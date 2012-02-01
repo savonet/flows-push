@@ -1,8 +1,5 @@
-<html>
-<head>
-  <title>Flows notification test page</title>
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
     var url = "http://" + window.location.hostname + ":" + window.location.port;
     var socket = io.connect(url);
     var radio;
@@ -29,10 +26,10 @@
         }
       }
     });
-  </script>
-</head>
-<body>
+</script>
+<div class="section" id="main">
   <h1>Flows notification test</h1>
-  <p id="content">Waiting..<br/></p>
-</body>
-</html>
+  <div class="content">
+    <p id="content">Waiting..<br/></p>
+  </div>
+</div>

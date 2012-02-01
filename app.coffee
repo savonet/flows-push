@@ -1,5 +1,4 @@
 require "./apps/queries"
 require "./apps/notification"
-require "./apps/chat"
 require "./apps/twitter"
 require "./apps/client"

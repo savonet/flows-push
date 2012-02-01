@@ -103,3 +103,5 @@ app.get "/radios", (req, res) ->
     res.header "Access-Control-Allow-Origin", "*"
     res.contentType "json"
     res.end JSON.stringify queries.exportRadios(ans)
+
+app.get "/test", (req, res) -> res.render "test.eco"

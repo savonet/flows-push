@@ -5,6 +5,10 @@
   <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
   <title>Savonet / Flows!</title>
   <link href="css/new.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script>
+    google.load("jquery", "1.6.1");
+  </script>
 </head>
 <body>
   <%- @body %>
