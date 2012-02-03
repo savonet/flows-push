@@ -28,7 +28,7 @@ radiosParams =
   only    : [
     "id", "name", "token", "website",
     "title", "artist", "genre", "description",
-    "longitude", "latitude"
+    "longitude", "latitude", "last_seen"
   ]
   include : {
     streams : {

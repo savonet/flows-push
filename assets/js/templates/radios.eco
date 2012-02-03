@@ -8,6 +8,9 @@
   if you find a bug or have an idea to improve it!
 </p>
 <div class="map"></div>
+<p> 
+  Sort list by: <a href="#" class="sort-latest">Latest update</a>, <a href="#" class="sort-alphabetical">Alphabetical order</a>
+</p>
 <div class="radios"><b>Loading...</b></div>
 <p   class="twitter">
   ...and since we are trying to go 2.0ish, here is

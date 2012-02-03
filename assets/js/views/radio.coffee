@@ -65,8 +65,6 @@ class App.View.Radio extends App.View
     streams += "</ul>"
 
 class App.View.Radios extends App.View
-  tagName: "ul"
-
   initialize: ->
     super
 
@@ -77,14 +75,16 @@ class App.View.Radios extends App.View
     $(@el).empty()
     if @collection.isEmpty()
       $(@el).html "<b>No registered radio currently broadcasting!</b>"
-    else
-      _.each @collection.models, (radio) =>
-        view = new App.View.Radio model: radio
-        li = $("<li></li>").append view.render().el
-        $(@el).append li
+      return this
+ 
+    ul = $("<ul></ul>")
+    _.each @collection.models, (radio) =>
+      view = new App.View.Radio model: radio
+      li = $("<li></li>").append view.render().el
+      ul.append li
 
-    $("#radios").html @el
-    
+    $(@el).html ul
+
     basicMP3Player?.init()
 
     this
