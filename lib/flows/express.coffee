@@ -1,5 +1,16 @@
+_              = require "underscore"
+eco            = require "eco"
 express        = require "express"
+
+Snockets       = require "snockets"
+Snockets.compilers.eco =
+  match: /\.eco$/
+  compileSync: (sourcePath, source) ->
+    basename = path.basename sourcePath, ".eco"
+    "(function(){App.Template[\"#{basename}\"] = #{eco.precompile source}}).call(this);"
+
 express.assets = require "connect-assets"
+path           = require "path"
 queries        = require "./queries"
 
 module.exports.host = process.env.FLOWS_HOST || "http://flows.liquidsoap.fm"
@@ -33,14 +44,18 @@ app.use express.session
 
 app.use express.static "public"
 
-app.use express.assets
+options =
   buildDir       : "tmp"
-  buildFilenamer : (file) -> file
+
+if process.env.NODE_ENV != "production"
+  options = _.extend options,
+    build          : false
+    buildDir       : "tmp"
+    buildFilenamer : (file) -> file
+
+app.use express.assets options
 
 app.set "view engine", "eco"
-
-app.get "/", (req, res) ->
-  res.redirect "http://liquidsoap.fm/flows.html"
 
 module.exports.auth = (req, res, next) ->
   onFailed = ->

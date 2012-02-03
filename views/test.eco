@@ -1,4 +1,3 @@
-<script src="/socket.io/socket.io.js"></script>
 <script>
     var url = "http://" + window.location.hostname + ":" + window.location.port;
     var socket = io.connect(url);

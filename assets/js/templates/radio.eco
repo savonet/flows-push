@@ -1,0 +1,11 @@
+<tr>
+  <td class="info">
+    <div class="name">
+      <a data-bind="href website; text name" target="_blank">Radio name</a>
+    </div>
+    <div class="genre" data-bind="genre"></div>
+    <div class="description" data-bind="description"></div>
+    <div class="metadata"><%- @metadata() %></div>
+   </td>
+  <td class="streams"><%- @streams() %></td>
+</tr>

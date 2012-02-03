@@ -1,0 +1,4 @@
+<b>
+  <a href="<%- @get "website" %>" target="_blank" style="text-decoration: none"><%- @get "name" %></a>
+</b>
+<p data-bind="description"><%- @get "description" %></p>

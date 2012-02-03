@@ -105,3 +105,4 @@ app.get "/radios", (req, res) ->
     res.end JSON.stringify queries.exportRadios(ans)
 
 app.get "/test", (req, res) -> res.render "test.eco"
+app.get "/", (req, res) -> res.render "index.eco"
