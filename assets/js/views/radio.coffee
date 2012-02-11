@@ -4,12 +4,16 @@ class App.View.Radio extends App.View
   attributes:
     border: 0
 
-  hasRendered: false
+  events:
+    "click a.sm2_button": "onPlay"
 
   initialize: ->
     super
 
-    @model.bind "change", @render
+    @bindTo @model,     "change",    @render
+    @bindTo App.player, "toggle",    @onToggle
+    @bindTo App.player, "loaded",    @syncPlayer
+    @bindTo App.player, "destroyed", @syncPlayer
 
   getMime: (format) ->
     switch format.split("/").shift().toLowerCase()
@@ -22,25 +26,38 @@ class App.View.Radio extends App.View
       else
         ""
 
-  metadata: =>
-    metadata = "<span class=\"title\">#{@model.get "title"}</span>"
+  onPlay: (e) =>
+    e.preventDefault()
 
-    artist = @model.get "artist"
-    if artist?
-      metadata = "#{artist} &mdash; #{metadata}"
+    el  = $(e.target)
+    url = el.attr "href"
 
-    metadata
+    if App.player.url == url && App.player.playing()
+      App.player.destroy()
+      @model.trigger "stop"
+    else
+      App.player.load url
+      @model.trigger "play", @model
+
+  syncPlayer: (url) =>
+    @$("a.sm2_playing").removeClass "sm2_playing"
+    @$("a[href=\"#{url}\"]").addClass "sm2_playing" if App.player.playing()
+
+  onToggle: =>
+    @$("a[href=\"#{App.player.url}\"]").toggleClass "sm2_playing"
 
   render: =>
     unless @hasRendered
       super
 
-      Backbone.ModelBinding.bind this
+      @latestMetadata = @model.metadata()
 
       return this
 
-    @$(".metadata").fadeOut "slow", =>
-      @$(".metadata").html(@metadata()).fadeIn "slow"
+    if @latestMetadata != @model.metadata()
+      @latestMetadata == @model.metadata()
+      @$(".metadata").fadeOut "slow", =>
+        @$(".metadata").html(@latestMetadata).fadeIn "slow"
 
     this
 
@@ -50,13 +67,16 @@ class App.View.Radio extends App.View
                                         
     _.each @model.get("streams"), (s) =>
       streams += "<li>"
-      
-      url  = "http://#{window.location.hostname}:#{window.location.port}/radio/#{token}/#{s.format}"
+     
+      port = if window.location.port != "" then ":#{window.location.port}" else ""
+      url  = "http://#{window.location.hostname}#{port}/radio/#{token}/#{s.format}"
       mime = @getMime s.format
       link = "<a href=\"#{url}\" type=\"#{mime}\">#{s.format}</a>"
       playerLink = "<a href=\"#{url}\" type=\"#{mime}\" class=\"sm2_button\"></a>"
       
       if soundManager.canPlayLink($(link).get(0)) and mime != "audio/aac"
+        if url == App.player.url and App.player.playing()
+          playerLink = "<a href=\"#{url}\" type=\"#{mime}\" class=\"sm2_button sm2_playing\"></a>"
         streams += playerLink
       streams += link
 
@@ -68,19 +88,47 @@ class App.View.Radios extends App.View
   initialize: ->
     super
 
-    @collection.bind "add",   @render
-    @collection.bind "reset", @render
-  
+    @bindTo @collection, "add",    @render
+    @bindTo @collection, "remove", @render
+    @bindTo @collection, "reset",  @render
+    @bindTo @collection, "change:last_seen", =>
+      @slideFirst() if @collection.sortType == "last_seen"
+
+    @views = {}
+
+  slideFirst: =>
+    old = @collection.models[0]
+    return unless old?
+
+    @collection.sort silent: true
+
+    radio = @collection.models[0]
+
+    return if radio.id == old.id
+
+    if oldView = @views[radio.id]
+      el = $(oldView.el).parent()
+      el.slideUp "slow", =>
+        oldView.unbindAll()
+        el.remove()
+
+    view = @views[radio.id] = new App.View.Radio(model: radio).render()
+    
+    $("<li></li>").append($(view.el)).hide().
+      prependTo($(@el).find("ul.radios")).slideDown "slow"
+
   render: ->
     $(@el).empty()
     if @collection.isEmpty()
       $(@el).html "<b>No registered radio currently broadcasting!</b>"
       return this
  
-    ul = $("<ul></ul>")
+    ul = $("<ul class=\"radios\"></ul>")
     _.each @collection.models, (radio) =>
-      view = new App.View.Radio model: radio
-      li = $("<li></li>").append view.render().el
+      @views[radio.id]?.remove()
+      
+      @views[radio.id] = new App.View.Radio(model: radio).render()
+      li = $("<li></li>").append @views[radio.id].el
       ul.append li
 
     $(@el).html ul

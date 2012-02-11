@@ -1,4 +1,33 @@
+<div class="menu">
+  <ul id="menu">
+    <li id="menu-developers">
+      <a href="http://dev.sourcefabric.org/browse/LS" target="_blank">developers</a></li>
+    <li id="menu-flows"><a href="/">Flows!</a></li>
+    <li id="menu-support">
+      <a href="http://liquidsoap.fm/documentation.html">documentation</a></li>
+    <li id="menu-download">
+      <a href="http://liquidsoap.fm/download.html">download</a></li>
+    <li id="menu-about">
+      <a href="http://liquidsoap.fm/index.html">about</a></li>
+  </ul>
+</div>
+<div>
+<div id="left">
+  <div class="section player">
+    <h1>Player</h1>
+    <div class="content"></div>
+  </div>
+  <div class="section actions">
+    <h1>Actions</h1>
+    <div class="content"></div>
+  </div>
+  <div class="section">
+    <h1>Twitter</h1>
+    <div class="content twitter"></div>
+  </div>
+</div>
 <div class="section" id="main">
   <h1>Liquidsoap Flows!</h1>
   <div class="content"></div>
+</div>
 </div>

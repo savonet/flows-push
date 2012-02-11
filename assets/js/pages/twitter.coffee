@@ -1,8 +1,10 @@
-class App.View.Twitter extends App.View
+class App.Page.Twitter extends App.Page
   id: "twitter-widget"
 
-  render: =>
-    @twitter = new TWTR.Widget
+  populate: =>
+    $(".twitter").html @el
+
+    @widget = new TWTR.Widget
       id:       "twitter-widget"
       version:  2
       type:     "search"
@@ -30,5 +32,5 @@ class App.View.Twitter extends App.View
         toptweets: true
         behavior:  "default"
     
-    @twitter.render().start()
+    @widget.render().start()
 

@@ -5,7 +5,7 @@
     </div>
     <div class="genre" data-bind="genre"></div>
     <div class="description" data-bind="description"></div>
-    <div class="metadata"><%- @metadata() %></div>
+    <div class="metadata"><%- @model.metadata() %></div>
    </td>
   <td class="streams"><%- @streams() %></td>
 </tr>

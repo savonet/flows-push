@@ -21,17 +21,16 @@ class App.View.Map extends App.View
   markers: []
 
   render: ->
-    _(@markers).each (marker) -> marker.setMap null
-    @markers = []
-
     @collection.each (r) =>
+      return if _.any @markers, (id) -> id == r.id
+      
       marker = new google.maps.Marker
         position: new google.maps.LatLng r.get("latitude"), r.get("longitude")
         map:      @map
         title:    r.get "name"
         content:  App.Template["map-content"](r)
-      
-      @markers.push marker
+     
+      @markers.push r.id
 
       infowindow = @infowindow
 

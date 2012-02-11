@@ -24,7 +24,6 @@ module.exports.exportRadios = exportRadios = (radios) ->
   exportRadio radio for radio in radios
 
 radiosParams =
-  order   : [ "name" ]
   only    : [
     "id", "name", "token", "website",
     "title", "artist", "genre", "description",

@@ -2,9 +2,9 @@ class App.Page extends App.View
   views: {}
 
   show: =>
-    $("#main div.content").html @render().el
+    $(@target).html @render().el
 
-    @populate()
+    @populate() if @populate?
 
     _.each _(@views).values(), (view) -> view.render()
 

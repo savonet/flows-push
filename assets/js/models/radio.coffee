@@ -13,6 +13,26 @@ class App.Model.Radio extends App.Model
     @socket.on @id, (data) =>
       @set data.radio if data.cmd == "metadata"
 
+  metadata: =>
+    metadata = "<span class=\"title\">#{@get "title"}</span>"
+
+    artist = @get "artist"
+    if artist?
+      metadata = "#{artist} &mdash; #{metadata}"
+
+    metadata
+
 class App.Collection.Radios extends App.Collection
-  model: App.Model.Radio
-  url: "/radios"
+  model:  App.Model.Radio
+  url:    "/radios"
+  
+  sortType: "last_seen"
+  comparator: (radio) =>
+    if @sortType == "last_seen"
+      -(new Date(radio.get "last_seen")).getTime()
+    else
+      radio.get @sortType
+  sort: (options, type) =>
+    @sortType = type if type?
+
+    super

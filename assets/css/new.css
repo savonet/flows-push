@@ -25,14 +25,29 @@ a[href]:hover {
 /* THE FRAMES/TABS */
 
 div.section {
-  position: absolute;
-  width: 20% ;
   padding-bottom: 20px
 }
-#savonet   {  left: 10% ; top: 16% }
-#community { right: 10% ; top: 16% }
-#liquidsoap { left: 35% ; right: 35% ; top: 10% ; bottom: 10% ; width: 30% }
-#main { left: 20% ; right: 20% ; top: 10% ; width: 60% }
+
+#left   { 
+  position: absolute; 
+  left: 7%; 
+  top: 16%;
+  width: 20%
+}
+
+#right  {
+  position: absolute;
+  right: 10% ;
+  top: 16% 
+}
+
+#main   {
+  position: absolute;
+  left: 30%;
+  right: 20%;
+  top: 10%; 
+  width: 60% 
+}
 
 img#logo { height: 7em ; border: 0px ; float: left; margin: 10px }
 div.section ul { padding-left: 1.2em }
@@ -60,20 +75,14 @@ div.section > div.content {
   margin: 0px 0px 0px 0px ;
 }
 
-#liquidsoap h1 { margin-left: auto ; margin-right: auto }
-#liquidsoap .content
-{
-    border-radius: 20px 20px 20px 20px;
-    -moz-border-radius: 20px 20px 20px 20px;
-}
-#community h1 { margin-left: 0 ; margin-right: auto }
-#community .content
+#right h1 { margin-left: 0 ; margin-right: auto }
+#right .content
 {
     border-radius: 0px 20px 20px 20px;
     -moz-border-radius: 0px 20px 20px 20px;
 }
-#savonet h1 { margin-right: 0 ; margin-left: auto }
-#savonet .content
+#left h1 { margin-right: 0 ; margin-left: auto }
+#left .content
 {
     border-radius: 20px 0px 20px 20px;
     -moz-border-radius: 20px 0px 20px 20px;
@@ -267,6 +276,10 @@ h5 {
 }
 
 /* Flows */
+
+.player a.play {
+  float: right;
+}
 
 .radios table {
     text-align: left;

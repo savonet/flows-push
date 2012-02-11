@@ -1,9 +1,9 @@
 #= require vendor/backbone.modelbinding.js
-#= require sound
+#= require vendor/soundmanager2.js
 #
 #= require app
 #
-#= require router
+#= require player
 #
 #= require model
 #= require collection
@@ -17,7 +17,6 @@
 #= require page
 #= require_tree pages
 
-App.router = new App.Router
-
 $ ->
-  App.app = new App
+  App.app    = new App
+  App.player = new App.Player

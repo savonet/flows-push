@@ -1,0 +1,8 @@
+<i style="<%= "display: none;" if @model? %>">Nothing playing currently..</i>
+<div class="radios" style="<%= "display: none;" unless @model? %>">
+  <a class="play sm2_button <%= if App?.player?.playing() then "sm2_playing"%>" href="<%= App?.player?.url %>"></a>  
+  <div class="name">
+     <a data-bind="href website; text name" target="_blank"></a>
+  </div>
+  <div class="metadata"><%- @model.metadata() if @model? %></div>
+</div>
