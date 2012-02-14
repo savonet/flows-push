@@ -1,5 +1,4 @@
-#= require vendor/backbone.modelbinding.js
-#= require vendor/soundmanager2.js
+#= require_tree vendor
 #
 #= require app
 #

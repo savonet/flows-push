@@ -25,7 +25,21 @@ class App.Model.Radio extends App.Model
 class App.Collection.Radios extends App.Collection
   model:  App.Model.Radio
   url:    "/radios"
-  
+ 
+  search: (test) =>
+    @cache = @models unless @cache?
+
+    @reset _.filter(@cache, test)
+
+  searchAny: (text) =>
+    rex = new RegExp text
+    @search (model) -> _.any(_.values(model.attributes), (attr) -> "#{attr}".match(rex))
+
+  fetch: =>
+    delete @cache
+
+    super
+
   sortType: "last_seen"
   comparator: (radio) =>
     if @sortType == "last_seen"

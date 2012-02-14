@@ -13,13 +13,13 @@ class App.Page.Player extends App.Page
   onClickPlay: (e) =>
     e.preventDefault()
 
-    el = @$("a.play")
-    if el.hasClass "sm2_playing"
-      el.removeClass "sm2_playing"
-    else
-      el.addClass "sm2_playing"
+    App.player.toggle()
 
-    App.player.trigger "toggle"
+    el = @$("a.play")
+    if App.player.playing el.attr("href")
+      el.addClass "sm2_playing"
+    else
+      el.removeClass "sm2_playing"
 
   onPlay: (radio) =>
     @model = radio

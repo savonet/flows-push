@@ -6,23 +6,22 @@ soundManager.useHTML5Audio = true
 class App.Player
   _.extend this.prototype, Backbone.Events
 
-  constructor: ->
-    @bind "toggle", @toggle
-
   toggle: =>
-    @sound?.togglePause()
+    if @sound?
+      @destroy()
+    else
+      @load @url if @url?
 
   destroy: =>
-    url = @url
-    
-    @sound?.destruct()
-    delete @sound
-    delete @url
+    return unless @sound?
 
-    @trigger "destroyed", url
+    @sound.destruct()
+    delete @sound
+
+    @trigger "stopped", @url
 
   load: (url) =>
-    return if url is @url
+    return if @sound? and url is @url
 
     unless soundManager.ok()
       return @trigger "error", "SoundManager2 isn't ready."
@@ -32,17 +31,9 @@ class App.Player
     @sound = soundManager.createSound
       autoPlay     : true
       id           : url
-      onfinish     : => @trigger "finished",    @sound
-      onplay       : => @trigger "played",      @sound
-      onpause      : => @trigger "paused",      @sound
-      onresume     : => @trigger "resumed",     @sound
-      onstop       : => @trigger "stopped",     @sound
       url          : url
-      whileplaying : => @trigger "playing",     @sound
-      whileloading : => @trigger "bytesLoaded", @sound
 
-    @url = url
+    @trigger "played", @url = url
 
-    @trigger "loaded", url
-
-  playing: => @sound?.playState == 1
+  playing: (url = @url) =>
+    @url == url and @sound? and not @sound.paused and @sound.playState == 1

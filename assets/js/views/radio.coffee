@@ -10,10 +10,9 @@ class App.View.Radio extends App.View
   initialize: ->
     super
 
-    @bindTo @model,     "change",    @render
-    @bindTo App.player, "toggle",    @onToggle
-    @bindTo App.player, "loaded",    @syncPlayer
-    @bindTo App.player, "destroyed", @syncPlayer
+    @bindTo @model,     "change", @render
+    @bindTo App.player, "all",    @syncPlayer
+
 
   getMime: (format) ->
     switch format.split("/").shift().toLowerCase()
@@ -32,25 +31,23 @@ class App.View.Radio extends App.View
     el  = $(e.target)
     url = el.attr "href"
 
-    if App.player.url == url && App.player.playing()
+    if App.player.playing url
       App.player.destroy()
       @model.trigger "stop"
     else
       App.player.load url
       @model.trigger "play", @model
 
-  syncPlayer: (url) =>
-    @$("a.sm2_playing").removeClass "sm2_playing"
-    @$("a[href=\"#{url}\"]").addClass "sm2_playing" if App.player.playing()
-
-  onToggle: =>
-    @$("a[href=\"#{App.player.url}\"]").toggleClass "sm2_playing"
+  syncPlayer: (ev, url) =>
+    @$("a[href=\"#{url}\"].sm2_button").toggleClass "sm2_playing", App.player.playing(url)
 
   render: =>
     unless @hasRendered
       super
 
       @latestMetadata = @model.metadata()
+
+      @$("a.stream").twipsy placement: "below"
 
       return this
 
@@ -71,12 +68,12 @@ class App.View.Radio extends App.View
       port = if window.location.port != "" then ":#{window.location.port}" else ""
       url  = "http://#{window.location.hostname}#{port}/radio/#{token}/#{s.format}"
       mime = @getMime s.format
-      link = "<a href=\"#{url}\" type=\"#{mime}\">#{s.format}</a>"
-      playerLink = "<a href=\"#{url}\" type=\"#{mime}\" class=\"sm2_button\"></a>"
+      link = "<a href=\"#{url}\" class=\"stream\" title=\"Open in new tab.\" type=\"#{mime}\">#{s.format}</a>"
+      playerLink = "<a href=\"#{url}\" title=\"Play it here!\" type=\"#{mime}\" class=\"stream sm2_button\"></a>"
       
       if soundManager.canPlayLink($(link).get(0)) and mime != "audio/aac"
-        if url == App.player.url and App.player.playing()
-          playerLink = "<a href=\"#{url}\" type=\"#{mime}\" class=\"sm2_button sm2_playing\"></a>"
+        if App.player.playing url
+          playerLink = "<a href=\"#{url}\" title=\"Play it here!\" type=\"#{mime}\" class=\"stream sm2_button sm2_playing\"></a>"
         streams += playerLink
       streams += link
 
