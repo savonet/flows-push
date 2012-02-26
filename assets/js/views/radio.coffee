@@ -5,7 +5,7 @@ class App.View.Radio extends App.View
     border: 0
 
   events:
-    "click a.sm2_button": "onPlay"
+    "click a.sm2_button.stream": "onPlay"
 
   initialize: ->
     super
@@ -47,7 +47,7 @@ class App.View.Radio extends App.View
 
       @latestMetadata = @model.metadata()
 
-      @$("a.stream").twipsy placement: "below"
+      @$("a.tip").twipsy placement: "below"
 
       return this
 
@@ -61,19 +61,25 @@ class App.View.Radio extends App.View
   streams: =>
     token = @model.get "token"
     streams = "<ul>"
-                                        
+      
+    streams += "<li>
+                  <a href=\"/radio/#{token}.pls\" class=\"tip sm2_button sm2_playlist\" type=\"audio/x-scpls\"
+                     title=\"Download the playlist\"></a>
+                  <a href=\"/radio/#{token}.pls\" class=\"tip\" title=\"Download the playlist\"
+                     target=\"_blank\">Playlist</a>
+                </li>"
+
     _.each @model.get("streams"), (s) =>
       streams += "<li>"
-     
       port = if window.location.port != "" then ":#{window.location.port}" else ""
       url  = "http://#{window.location.hostname}#{port}/radio/#{token}/#{s.format}"
       mime = @getMime s.format
-      link = "<a href=\"#{url}\" class=\"stream\" title=\"Open in new tab.\" type=\"#{mime}\">#{s.format}</a>"
-      playerLink = "<a href=\"#{url}\" title=\"Play it here!\" type=\"#{mime}\" class=\"stream sm2_button\"></a>"
+      link = "<a href=\"#{url}\" class=\"tip\" title=\"Open stream in new tab.\" target=\"_blank\" type=\"#{mime}\">#{s.format}</a>"
+      playerLink = "<a href=\"#{url}\" title=\"Play it here!\" type=\"#{mime}\" class=\"tip sm2_button stream\"></a>"
       
       if soundManager.canPlayLink($(link).get(0)) and mime != "audio/aac"
         if App.player.playing url
-          playerLink = "<a href=\"#{url}\" title=\"Play it here!\" type=\"#{mime}\" class=\"stream sm2_button sm2_playing\"></a>"
+          playerLink = "<a href=\"#{url}\" title=\"Play it here!\" type=\"#{mime}\" class=\"tip sm2_button sm2_playing\"></a>"
         streams += playerLink
       streams += link
 

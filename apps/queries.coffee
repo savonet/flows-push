@@ -3,6 +3,7 @@ _               = require "underscore"
 queries         = require "../lib/flows/queries"
 twitter         = require "../lib/flows/twitter"
 url             = require "url"
+{pls}           = require "../lib/flows/utils"
 
 app.get "/radio", (req, res) ->
   name    = req.query.name
@@ -20,6 +21,18 @@ app.get "/radio", (req, res) ->
     res.header "Access-Control-Allow-Origin", "*"
     res.contentType "json"
     res.end JSON.stringify queries.exportRadio(radio)
+
+app.get /^\/radio\/([^\/\.]+)(\.|\/)pls$/, (req, res) ->
+  [token] = req.params
+  queries.getRadio { token : token }, (err, radio) ->
+    return res.send("An error occured while processing your request", 500) if err?
+
+    return res.send "No such radio", 404 unless radio?
+
+    res.header "Access-Control-Allow-Origin", "*"
+    res.contentType "audio/x-scpls"
+    
+    res.send pls(radio)
 
 app.get "/radio/:token", (req, res) ->
   queries.getRadio { token : req.params.token }, (err, radio) ->

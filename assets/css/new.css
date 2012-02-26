@@ -319,6 +319,10 @@ h5 {
     width: 70px;
 }
 
+.radios .streams li {
+    text-align: center;
+}
+
 .radios .streams a {
     float: right;
 }

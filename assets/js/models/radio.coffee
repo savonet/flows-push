@@ -32,7 +32,7 @@ class App.Collection.Radios extends App.Collection
     @reset _.filter(@cache, test)
 
   searchAny: (text) =>
-    rex = new RegExp text
+    rex = new RegExp text, "i"
     @search (model) -> _.any(_.values(model.attributes), (attr) -> "#{attr}".match(rex))
 
   fetch: =>

@@ -3,15 +3,21 @@ class App.Page.Actions extends App.Page
   template: "actions"
 
   events:
-    "click  a.sort-latest":       "orderLatest"
-    "click  a.sort-alphabetical": "orderAlphabetical"
-    "change input.search":        "onSearch"
-    "click  a.search":            "onSearch"
-    "click  a.reset":             "onReset"
+    "click   a.sort-latest":       "orderLatest"
+    "click   a.sort-alphabetical": "orderAlphabetical"
+    "keydown input.search":        "onDelayedSearch"
+    "click   a.reset":             "onReset"
+ 
+  asyncSearch: null
 
-  onSearch: (e) =>
-    e.preventDefault()
-    @collection.searchAny @$("input.search").val()
+  onDelayedSearch: (e) =>
+    return if @asyncSearch?
+
+    cb = =>
+      @collection.searchAny @$("input.search").val()
+      @asyncSearch = null
+
+    @asyncSearch = setTimeout cb, 200
 
   onReset: (e) =>
     e.preventDefault()

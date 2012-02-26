@@ -4,4 +4,4 @@
   <li><a href="#" class="sort-alphabetical">Alphabetical order</a></li>
 </ul>
 <h4>Search</h4>
-<input class="search"></input>&nbsp;<a href="#" class="search">search</a>&nbsp;/&nbsp;<a href="#" class="reset">reset</a>
+<input class="search"></input>&nbsp;<a href="#" class="reset">reset</a>
