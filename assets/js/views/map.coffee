@@ -22,21 +22,27 @@ class App.View.Map extends App.View
 
   render: ->
     @collection.each (r) =>
-      return if _.any @markers, (id) -> id == r.id
+      if marker = _.find(@markers, (x) -> x.id == r.id)
+        return marker.setMap @map
       
       marker = new google.maps.Marker
         position: new google.maps.LatLng r.get("latitude"), r.get("longitude")
         map:      @map
         title:    r.get "name"
         content:  App.Template["map-content"](r)
-     
-      @markers.push r.id
+      
+      marker.id = r.id
+
+      @markers.push marker
 
       infowindow = @infowindow
 
       google.maps.event.addListener marker, "click", ->
         infowindow.setContent @content
         infowindow.open       @map, this
-    
+ 
+    _.each _.filter(@markers, (m) => not @collection.any((r) -> r.id == m.id)), (m) ->
+      m.setMap null
+
     this
 
