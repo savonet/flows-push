@@ -24,7 +24,7 @@ redis.on "message", (channel, message) ->
       else
         metadata = radio.title
 
-      status = "On #{radio.name}: #{metadata}"
+      status = "Listening to #{metadata} on #{radio.name}"
 
       getUrl = (fn) ->
         if radio.website?
@@ -47,12 +47,10 @@ redis.on "message", (channel, message) ->
         params.coordinates = [lat, long]
 
       getUrl (url) ->
-        end = " #savonetflows#{url}"
-
-        if status.length + end.length > 140
+        if status.length + url.length > 140
           # We cut the status and add ".."
-          len = 140 - end.length - 2
+          len = 140 - url.length - 2
           status = "#{status.slice 0, len}.."
 
-        status = "#{status} #savonetflows#{url}"
+        status = "#{status}#{url}"
         twitter.updateStatus client, status for client in radio.twitters

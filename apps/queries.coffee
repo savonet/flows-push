@@ -55,8 +55,7 @@ app.get "/radio/:token/twitter/auth", auth, (req, res) ->
 
     return res.send "No such radio", 404 unless radio?
 
-    ok = _.any req.user.radios, (check) ->
-            radio.token == check.token
+    ok = _.any req.user.radios, (check) -> radio.token == check.token
     return res.send "Radio #{radio.token} does not belong to user #{user.username}" unless ok
 
     twitter.getRequest "#{host}#{twitterCallback radio.token}", (err, request) ->
