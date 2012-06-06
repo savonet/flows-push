@@ -2,4 +2,4 @@
 city   = new City "./geoip/GeoIPCity.dat"
 
 module.exports.getCity = (ip, fn) ->
-  city.lookup ip, (err, data) -> fn
+  city.lookup ip, fn

@@ -10,10 +10,6 @@ io.sockets.on "connection", (socket) ->
     all = token == "flows"
 
     if all
-      socket.join "flows"
-      return socket.emit "joined", "flows"
-   
-    if all
       d = new Date()
       d.setHours(d.getHours()-1)
       args =

@@ -69,7 +69,7 @@ createListener = (stream, ip, fn) ->
       longitude : data.longitude
       last_seen : new Date() }, (err, result) ->
         return fn err, null if err?
-        fn result, null
+        fn null, result
 
 module.exports.getListener = (stream, ip, fn) ->
   Listener.findOne { 
