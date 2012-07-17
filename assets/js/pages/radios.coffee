@@ -8,9 +8,11 @@ class App.Page.Radios extends App.Page
   initialize: =>
     @views.map     = new App.View.Map    collection: @collection
     @views.radios  = new App.View.Radios collection: @collection
+    @views.count   = new App.View.Count  collection: @collection
 
   populate: =>
     @$(".map").append  @views.map.el
+    @$(".count").html  @views.count.el
     @$(".radios").html @views.radios.el
     @$(".tabs").tabs()
 

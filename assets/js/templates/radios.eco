@@ -27,6 +27,8 @@
   </div>
   <div class="tab-pane active" id="radios">
     <div class="map">
-      <a href="#" class="toggle-map">(hide map)</a></div>
+      <a href="#" class="toggle-map">(hide map)</a>
+    </div>
+    <div class="count"></div>
     <div class="radios"><b>Loading...</b></div>
   </div>
