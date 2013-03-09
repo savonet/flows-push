@@ -15,8 +15,7 @@ class App.View.Map extends App.View
       streetViewControl: false
       mapTypeControl:    false
 
-    @bindTo @collection, "add",   @render
-    @bindTo @collection, "reset", @render
+    @bindTo @collection, "add remove reset", @render
 
   markers: []
 

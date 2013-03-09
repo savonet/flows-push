@@ -4,9 +4,7 @@ class App.View.Count extends App.View
   initialize: ->
     super
 
-    @bindTo @collection, "add",    @render
-    @bindTo @collection, "remove", @render
-    @bindTo @collection, "reset",  @render
+    @bindTo @collection, "add remove reset", @render
 
   render: ->
     @$el.text "#{@collection.size()} radios"

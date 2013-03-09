@@ -91,9 +91,7 @@ class App.View.Radios extends App.View
   initialize: ->
     super
 
-    @bindTo @collection, "add",    @render
-    @bindTo @collection, "remove", @render
-    @bindTo @collection, "reset",  @render
+    @bindTo @collection, "add remove reset sort", @render
     @bindTo @collection, "change:last_seen", =>
       @slideFirst() if @collection.sortType == "last_seen"
 
