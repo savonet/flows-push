@@ -11,31 +11,14 @@ module.exports.Listener = FastLegS.Base.extend
   tableName  : "listeners"
   primaryKey : "id"
 
-module.exports.Twitter = Twitter = FastLegS.Base.extend
-  tableName  : "twitters"
-  primaryKey : "id"
-
 module.exports.Radio = Radio = FastLegS.Base.extend
   tableName  : "radios"
   primaryKey : "id"
 
-module.exports.TwitterRadio = TwitterRadio = FastLegS.Base.extend
-  tableName   : "twitters_radios"
-  foreignKeys : [ {
-    model : Twitter
-    key   : "twitter_id" }, {
-    model : Radio
-    key   : "radio_id" } ]
-
 Radio.many = [ {
   streams : Stream,
-  joinOn  : "radio_id" },{
-  twitters : Twitter,
-  assoc    : TwitterRadio } ]
-
-Twitter.many = [
-  radios : Radio
-  assoc  : TwitterRadio ]
+  joinOn  : "radio_id" 
+} ]
 
 module.exports.User = FastLegS.Base.extend
   tableName  : "users"

@@ -1,7 +1,7 @@
-{app}  = require "./express"
-socket = require "socket.io"
+{server} = require "./express"
+socket   = require "socket.io"
 
-module.exports.io = io = socket.listen app
+module.exports.io = io = socket.listen server
 
 io.configure "production", ->
   io.enable "browser client minification"

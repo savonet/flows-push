@@ -1,6 +1,7 @@
 _              = require "underscore"
 eco            = require "eco"
 express        = require "express"
+{createServer} = require "http"
 
 Snockets       = require "snockets"
 Snockets.compilers.eco =
@@ -23,15 +24,17 @@ resolveProxy = (req, res, next) ->
   req.connection.remoteAddress = ipAddress
   next()
 
-module.exports.app = app = express.createServer()
+module.exports.app = app = express()
 
 app.configure "production", ->
   process.addListener "uncaughtException", (err) ->
     console.error "Uncaught exception: #{err}"
 
-port = parseInt process.env.PORT or 6000
-app.listen port, ->
-  console.log "Listening on port " + app.address().port + "."
+module.exports.server = server = createServer app
+
+port = parseInt process.env.PORT or 8080
+server.listen port
+console.log "Listening on port #{port}."
 
 app.use resolveProxy
 
@@ -55,7 +58,7 @@ if process.env.NODE_ENV != "production"
 
 app.use express.assets options
 
-app.set "view engine", "eco"
+app.engine "eco", require("consolidate").eco
 
 module.exports.auth = (req, res, next) ->
   onFailed = ->

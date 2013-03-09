@@ -1,8 +1,6 @@
 _                  = require "underscore"
 {Listener, Radio, 
- Stream, Twitter, 
- TwitterRadio,
- User}             = require "../../schema/model"
+ Stream, User}     = require "../../schema/model"
 {clean}            = require "./utils"
 {getCity}          = require "./geoip"
 
@@ -11,13 +9,10 @@ exportStream = (stream) ->
   delete stream.id
   clean stream
 
-exportTwitter = (twitter) -> twitter.name
-
 module.exports.exportRadio = exportRadio = (radio) ->
   radio = _.clone radio
   delete radio.id
   radio.streams  = (exportStream stream for stream in radio.streams)
-  radio.twitters = (exportTwitter twitter for twitter in radio.twitters)
   clean radio
 
 module.exports.exportRadios = exportRadios = (radios) ->
@@ -32,9 +27,6 @@ radiosParams =
   include : {
     streams : {
       only : [ "id", "format", "url", "msg" ]
-    }
-    twitters : {
-      only : [ "id", "name", "token", "secret" ]
     }
   }
 
@@ -81,46 +73,6 @@ module.exports.getListener = (stream, ip, fn) ->
 
 module.exports.updateListener = (listener) ->
   Listener.update { id : listener.id }, { last_seen : new Date() }, ->
-
-createTwitter = (radio, access, fn) ->
-  Twitter.create {
-    name     : access.name
-    token    : access.token
-    secret   : access.secret }, fn
-
-assocTwitter = (radio, twitter, fn) ->
-  ok = twitter.radios? and _.any twitter.radios, (e) -> e.token == radio.token
-  return fn null, twitter if ok
-
-  TwitterRadio.create {
-    twitter_id : twitter.id
-    radio_id   : radio.id }, (err, result) ->
-      return fn err, null if err?
-      fn null, twitter
-
-module.exports.updateTwitter = (radio, access, fn) ->
-  Twitter.findOne { name: access.name }, {
-    include : {
-      radios : { only : ["token"] } 
-    } }, (err, twitter) ->
-    return fn err, null if err?
-
-    if twitter?
-      Twitter.update { id : twitter.id }, {
-        token  : access.token
-        secret : access.secret }, (err, result) ->
-        return fn err, null if err?
-        assocTwitter radio, twitter, fn
-    else
-      createTwitter radio, access, (err, result) ->
-        return fn err, null if err?
-        [twitter] = result.rows
-        assocTwitter radio, twitter, fn
-
-module.exports.destroyRadioTwitter = (radio, twitter, fn) ->
-  TwitterRadio.destroy { 
-    twitter_id : twitter.id,
-    radio_id   : radio.id }, fn
 
 module.exports.updateListener = (listener) ->
   Listener.update { id : listener.id }, { last_seen : new Date() }, ->

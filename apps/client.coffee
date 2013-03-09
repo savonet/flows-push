@@ -3,7 +3,6 @@ crypto  = require "crypto"
 {io}    = require "../lib/flows/io"
 queries = require "../lib/flows/queries"
 {clean} = require "../lib/flows/utils"
-twitter = require "../lib/flows/twitter"
 
 admin = io.of "/admin"
 
@@ -67,43 +66,3 @@ admin.on "connection", (socket) ->
       return socket.emit "error", "Delete failed" unless results == 1
 
       socket.emit "deleted-radio"
-
-  socket.on "auth-twitter", (token) ->
-    return socket.emit "error", "You are not signed-in!" unless socket.user?
-
-    radio = _.find socket.user.radios, (radio) ->
-      radio.token == token
-    return socket.emit "error", "No such radio!" unless radio?
-
-    twitter.getRequest "oob", (err, request) ->
-      return socket.emit "error", err if err?
-
-      socket.json.emit "confirm-twitter",
-        token : request.token
-        url   : request.url
-
-      socket.on request.token, (verifier) ->
-        twitter.getAccess request, verifier, (err, access) ->
-          return socket.emit "error", err if err?
-
-          queries.updateTwitter radio, access, (err, result) ->
-              return socket.emit "error", err if err?
-
-              twitter.clients[access.name] = null
-
-              socket.emit "authenticated-twitter", access.name
-
-  socket.on "delete-twitter", (opts) ->
-    return socket.emit "error", "You are not signed-in!" unless socket.user?
-
-    radio = _.find socket.user.radios, (radio) ->
-      radio.token == opts.token
-    return socket.emit "error", "No such radio!" unless radio?
-
-    client = _.find radio.twitters, (twitter) -> twitter.name == opts.name
-    return socket.emit "error", "Twitter account not authenticated for that radio!" unless client?
-
-    queries.destroyRadioTwitter radio, client, (err) ->
-      return socket.emit "error", err if err?
-
-      socket.emit "deleted-twitter"
