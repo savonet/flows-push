@@ -41,7 +41,7 @@ class App.View.Radio extends App.View
   syncPlayer: (ev, url) =>
     @$("a[href=\"#{url}\"].sm2_button").toggleClass "sm2_playing", App.player.playing(url)
 
-  render: =>
+  render: ->
     unless @hasRendered
       super
 
