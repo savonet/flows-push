@@ -9,4 +9,4 @@ class App.View.Count extends App.View
     @bindTo @collection, "reset",  @render
 
   render: ->
-    $(@el).text "#{@collection.size()} radios"
+    @$el.text "#{@collection.size()} radios"

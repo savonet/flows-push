@@ -14,7 +14,7 @@ class App.View extends Backbone.View
       obj.unbind event, callback, context
 
   render: ->
-    $(@el).html App.Template[@template](this) if @template?
+    @$el.html App.Template[@template](this) if @template?
     
     @hasRendered = true
 

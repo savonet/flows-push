@@ -110,7 +110,7 @@ class App.View.Radios extends App.View
     return if radio.id == old.id
 
     if oldView = @views[radio.id]
-      el = $(oldView.el).parent()
+      el = oldView.$el.parent()
       el.slideUp "slow", =>
         oldView.unbindAll()
         el.remove()
@@ -118,12 +118,12 @@ class App.View.Radios extends App.View
     view = @views[radio.id] = new App.View.Radio(model: radio).render()
     
     $("<li></li>").append($(view.el)).hide().
-      prependTo($(@el).find("ul.radios")).slideDown "slow"
+      prependTo(@$el.find("ul.radios")).slideDown "slow"
 
   render: ->
-    $(@el).empty()
+    @$el.empty()
     if @collection.isEmpty()
-      $(@el).html "<b>No registered radio currently broadcasting!</b>"
+      @$el.html "<b>No registered radio currently broadcasting!</b>"
       return this
  
     ul = $("<ul class=\"radios\"></ul>")
@@ -134,7 +134,7 @@ class App.View.Radios extends App.View
       li = $("<li></li>").append @views[radio.id].el
       ul.append li
 
-    $(@el).html ul
+    @$el.html ul
 
     basicMP3Player?.init()
 
