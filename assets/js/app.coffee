@@ -6,5 +6,4 @@ class window.App
     @main    = (new App.Page.Radios  collection: @radios).show()
     @left    = (new App.Page.Actions collection: @radios).show()
     @player  = (new App.Page.Player  collection: @radios).show()
-    @twitter = (new App.Page.Twitter).show()
     @radios.fetch()
